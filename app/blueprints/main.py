@@ -1,8 +1,7 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 main_bp = Blueprint("main", __name__)
 
-@main_bp.get("/")
+@main_bp.route("/")
 def index():
-    # На этапе 1 просто текст. Шаблоны добавим на этапе 2.
-    return "Hello, TASS!"
+    return render_template("main/index.html", title="Главная")
