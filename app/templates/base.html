@@ -6,22 +6,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="{{ url_for('static', filename='css/tass.css') }}" rel="stylesheet">
 </head>
-<body>
-  <header>
-    <nav>
-      <a href="{{ url_for('main.index') }}">Главная</a> |
-      <a href="{{ url_for('settings.index') }}">Настройки</a> |
-      <a href="{{ url_for('history.index') }}">История</a> |
-      <a href="{{ url_for('assistants.index') }}">Помощники</a>
-    </nav>
+<body class="theme">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="{{ url_for('main.index') }}">
+        <span class="brand__logo">ТАСС</span>
+        <span class="brand__name">Ассистент выпускающего редактора</span>
+      </a>
+
+      <button class="nav__toggle" aria-label="Открыть меню" data-js="nav-toggle">☰</button>
+
+      <nav class="nav" data-js="nav">
+        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('main.') %}is-active{% endif %}" href="{{ url_for('main.index') }}">Главная</a>
+        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('settings.') %}is-active{% endif %}" href="{{ url_for('settings.index') }}">Настройки</a>
+        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('history.') %}is-active{% endif %}" href="{{ url_for('history.index') }}">История</a>
+        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
+  <main class="container page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash">
+          {% for category, message in messages %}
+            <div class="alert alert--{{ category|default('info') }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
   </main>
 
-  <footer>
-    <small>© ТАСС ассистент</small>
+  <footer class="footer">
+    <div class="container footer__inner">
+      <small>© ТАСС ассистент</small>
+      <small>Версия рыбы интерфейса</small>
+    </div>
   </footer>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
