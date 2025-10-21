@@ -9,10 +9,19 @@
 <body class="theme">
   <header class="topbar">
     <div class="container topbar__inner">
-      <a class="brand" href="{{ url_for('main.index') }}">
-        <span class="brand__logo">ТАСС</span>
-        <span class="brand__name">Ассистент выпускающего редактора</span>
-      </a>
+<a class="brand" href="{{ url_for('main.index') }}" title="ТАСС — Ассистент выпускающего редактора">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"
+       class="brand__logo" aria-hidden="true">
+    <g clip-path="url(#logo_square_large_svg__a)">
+      <path fill="#0D1665" d="M80 0H0v80h80z"></path>
+      <path fill="#fff" d="M5.12 50.203h18.135l-2.478 4.295h-4.764V68.66h-4.538V54.498H5.119zM48.38 54.498c-.514 0-.881.316-.881.858v8.173c0 .542.367.836.88.836h9.399v4.295H48.38c-3.291 0-5.425-1.987-5.425-5.13v-8.174c0-3.116 2.134-5.154 5.425-5.154h10.526l-2.477 4.296zM34.77 50.203h-8.489l-2.478 4.295h10.968c.541 0 .858.316.858.858v1.964H28.51c-3.263 0-5.667 2.405-5.667 5.673s2.404 5.673 5.667 5.673h11.656V55.362c0-3.116-2.134-5.154-5.396-5.154m.858 14.298h-6.56c-.936 0-1.62-.683-1.62-1.62s.684-1.648 1.62-1.648h6.56zM65.227 54.498c-.514 0-.88.316-.88.858v8.173c0 .542.367.836.88.836h9.398v4.295h-9.398c-3.285 0-5.424-1.987-5.424-5.13v-8.174c0-3.116 2.133-5.154 5.424-5.154h10.527l-2.478 4.296z"></path>
+    </g>
+    <defs>
+      <clipPath id="logo_square_large_svg__a"><path fill="#fff" d="M0 0h80v80H0z"></path></clipPath>
+    </defs>
+  </svg>
+  <span class="brand__name" title="Ассистент выпускающего редактора">АВР</span>
+</a>
 
       <button class="nav__toggle" aria-label="Открыть меню" data-js="nav-toggle">☰</button>
 
@@ -21,6 +30,19 @@
         <a class="nav__link {% if request.endpoint and request.endpoint.startswith('settings.') %}is-active{% endif %}" href="{{ url_for('settings.index') }}">Настройки</a>
         <a class="nav__link {% if request.endpoint and request.endpoint.startswith('history.') %}is-active{% endif %}" href="{{ url_for('history.index') }}">История</a>
         <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+
+        <span class="nav__spacer"></span>
+
+        {% if current_user.is_authenticated %}
+          <span class="nav__user">Вы вошли как {{ current_user.email }}</span>
+          <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="nav__link nav__button" type="submit">Выйти</button>
+          </form>
+        {% else %}
+          <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.login' %}is-active{% endif %}" href="{{ url_for('auth.login') }}">Вход</a>
+          <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.register' %}is-active{% endif %}" href="{{ url_for('auth.register') }}">Регистрация</a>
+        {% endif %}
       </nav>
     </div>
   </header>

@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<h1>Вход</h1>
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div>
+    {{ form.email.label }}<br>
+    {{ form.email(size=40) }}
+    {% for e in form.email.errors %}<div class="error">{{ e }}</div>{% endfor %}
+  </div>
+  <div>
+    {{ form.password.label }}<br>
+    {{ form.password(size=40) }}
+    {% for e in form.password.errors %}<div class="error">{{ e }}</div>{% endfor %}
+  </div>
+  <div>{{ form.submit() }}</div>
+</form>
+<p><a href="{{ url_for('auth.forgot_password') }}">Забыли пароль?</a></p>
+<p>Нет аккаунта? <a href="{{ url_for('auth.register') }}">Регистрация</a></p>
+{% endblock %}
