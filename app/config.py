@@ -22,6 +22,8 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "no-reply@example.com")
 
+    MAIL_BACKEND = os.getenv("MAIL_BACKEND", "smtp")
+    SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
     # токены
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", "dev-salt")
 
