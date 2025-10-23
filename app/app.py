@@ -29,12 +29,18 @@ def create_app():
     app.register_blueprint(assistants_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
-    # Простейший healthcheck
-    @app.route("/healthz")
-    def healthz():
-        return {"status": "ok"}
+    # --- временный debug-route: показывает, попали ли значения в app.config (не выводит сам ключ) ---
+    @app.route("/_debug_env")
+    def _debug_env():
+        return {
+            "MAIL_BACKEND": app.config.get("MAIL_BACKEND"),
+            "HAS_SENDGRID_KEY": bool(app.config.get("SENDGRID_API_KEY")),
+            "MAIL_DEFAULT_SENDER": app.config.get("MAIL_DEFAULT_SENDER"),
+            "ENV": app.config.get("ENV"),
+            "DEBUG": app.config.get("DEBUG")
+        }
 
-    return app
+    return app  # ← ВАЖНО: 4 пробела отступа, внутри функции create_app()
 
 # Локальный старт
 if __name__ == "__main__":
