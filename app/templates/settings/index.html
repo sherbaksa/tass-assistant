@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{ title }}</h1>
-<p>Здесь будет функционал страницы {{ title }}.</p>
+
+<div class="card">
+  <h2 class="card__title">Личные настройки</h2>
+  <p class="card__sub">Здесь будут ваши персональные настройки.</p>
+</div>
+
+{% if current_user.is_admin %}
+<div class="card" style="border-color: var(--warn);">
+  <h2 class="card__title">⚙️ Администрирование</h2>
+  <p class="card__sub">Управление системой и пользователями</p>
+  <a href="{{ url_for('settings.users') }}" class="btn btn--admin">
+    Управление пользователями
+  </a>
+</div>
+{% endif %}
+
 {% endblock %}

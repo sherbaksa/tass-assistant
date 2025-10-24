@@ -31,7 +31,9 @@
           {% if current_user.is_authenticated %}
             <a class="nav__link {% if request.endpoint and request.endpoint.startswith('settings.') %}is-active{% endif %}" href="{{ url_for('settings.index') }}">Настройки</a>
             <a class="nav__link {% if request.endpoint and request.endpoint.startswith('history.') %}is-active{% endif %}" href="{{ url_for('history.index') }}">История</a>
-            <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+            {% if current_user.is_admin %}
+              <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+            {% endif %}
           {% endif %}
 
           <span class="nav__spacer"></span>
@@ -44,7 +46,9 @@
             </form>
           {% else %}
             <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.login' %}is-active{% endif %}" href="{{ url_for('auth.login') }}">Вход</a>
-            <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.register' %}is-active{% endif %}" href="{{ url_for('auth.register') }}">Регистрация</a>
+            {% if config.REGISTRATION_ENABLED %}
+              <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.register' %}is-active{% endif %}" href="{{ url_for('auth.register') }}">Регистрация</a>
+            {% endif %}
           {% endif %}
         </nav>
     </div>
