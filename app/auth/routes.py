@@ -20,7 +20,11 @@ def load_user(user_id):
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
-
+        # Проверка, разрешена ли регистрация
+        from flask import current_app
+        if not current_app.config.get('REGISTRATION_ENABLED', True):
+            flash("Регистрация новых пользователей временно отключена", "warning")
+            return redirect(url_for("auth.login"))
     form = RegisterForm()
     if form.validate_on_submit():
         email = form.email.data.strip().lower()
@@ -28,7 +32,15 @@ def register():
             flash("Пользователь с таким e-mail уже существует", "danger")
             return render_template("auth/register.html", form=form)
 
-        user = User(email=email, password_hash=hash_password(form.password.data), is_active=False)
+        # Проверяем, есть ли уже пользователи в системе
+        is_first_user = User.query.count() == 0
+
+        user = User(
+            email=email,
+            password_hash=hash_password(form.password.data),
+            is_active=False,
+            is_admin=is_first_user  # Первый пользователь автоматически становится админом
+        )
         db.session.add(user)
         db.session.commit()
 

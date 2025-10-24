@@ -27,6 +27,9 @@ class Config:
     # токены
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", "dev-salt")
 
+    # регистрация
+    REGISTRATION_ENABLED = os.getenv("REGISTRATION_ENABLED", "1") == "1"
+
     # cookies / сессии
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"

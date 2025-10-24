@@ -138,3 +138,16 @@ body.theme{
   line-height: 1.2;
   white-space: nowrap;
 }
+/* Admin button - стиль логотипа ТАСС */
+.btn--admin{
+  background: #0D1665;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0;
+  padding: 14px 20px;
+}
+.btn--admin:hover{
+  background: #1a2380;
+  box-shadow: 0 4px 12px rgba(13, 22, 101, 0.5);
+}

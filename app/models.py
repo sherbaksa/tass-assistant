@@ -18,6 +18,7 @@ class User(UserMixin, TimestampMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=False)
     is_staff = db.Column(db.Boolean, nullable=False, default=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     last_login_at = db.Column(db.DateTime)
     last_login_ip = db.Column(db.String(45))
@@ -35,7 +36,7 @@ class User(UserMixin, TimestampMixin, db.Model):
         return self.email
 
     def __repr__(self) -> str:
-        return f"<User id={self.id} email={self.email!r} active={self.is_active} staff={self.is_staff}>"
+        return f"<User id={self.id} email={self.email!r} active={self.is_active} staff={self.is_staff} admin={self.is_admin}>"
 
 class EmailToken(TimestampMixin, db.Model):
     __tablename__ = "email_tokens"

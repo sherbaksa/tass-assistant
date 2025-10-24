@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="card" style="border-color: var(--warn);">
+  <h2 class="card__title">🔐 Управление регистрацией</h2>
+  <p class="card__sub">
+    Текущий статус:
+    <strong style="color: {% if config.REGISTRATION_ENABLED %}var(--ok){% else %}var(--err){% endif %};">
+      {% if config.REGISTRATION_ENABLED %}Регистрация открыта{% else %}Регистрация закрыта{% endif %}
+    </strong>
+  </p>
+  <form action="{{ url_for('settings.toggle_registration') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn {% if config.REGISTRATION_ENABLED %}btn--muted{% else %}btn--admin{% endif %}">
+      {% if config.REGISTRATION_ENABLED %}🔒 Отключить регистрацию{% else %}🔓 Включить регистрацию{% endif %}
+    </button>
+  </form>
+</div>
+
+<div class="card">
+  <h2 class="card__title">Пользователи системы</h2>
+  <p class="card__sub">Всего пользователей: {{ users|length }}</p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Активен</th>
+        <th>Администратор</th>
+        <th>Дата регистрации</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>
+          {{ user.email }}
+          {% if user.id == current_user.id %}
+            <span class="badge">вы</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if user.is_active %}
+            <span style="color: var(--ok);">✓ Да</span>
+          {% else %}
+            <span style="color: var(--err);">✗ Нет</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if user.is_admin %}
+            <span style="color: var(--ok);">✓ Да</span>
+          {% else %}
+            <span style="color: var(--tass-muted);">✗ Нет</span>
+          {% endif %}
+        </td>
+        <td style="color: var(--tass-muted);">
+          {{ user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else '—' }}
+        </td>
+        <td>
+          {% if user.id != current_user.id %}
+          <form action="{{ url_for('settings.toggle_admin', user_id=user.id) }}" method="post" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn--muted" style="padding: 6px 12px; font-size: 14px;">
+              {% if user.is_admin %}Убрать права{% else %}Назначить админом{% endif %}
+            </button>
+          </form>
+          {% else %}
+          <span style="color: var(--tass-muted);">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p style="margin-top: 20px;">
+  <a href="{{ url_for('settings.index') }}" class="btn btn--muted">← Назад к настройкам</a>
+</p>
+
+{% endblock %}
