@@ -25,25 +25,28 @@
 
       <button class="nav__toggle" aria-label="Открыть меню" data-js="nav-toggle">☰</button>
 
-      <nav class="nav" data-js="nav">
-        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('main.') %}is-active{% endif %}" href="{{ url_for('main.index') }}">Главная</a>
-        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('settings.') %}is-active{% endif %}" href="{{ url_for('settings.index') }}">Настройки</a>
-        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('history.') %}is-active{% endif %}" href="{{ url_for('history.index') }}">История</a>
-        <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+        <nav class="nav" data-js="nav">
+          <a class="nav__link {% if request.endpoint and request.endpoint.startswith('main.') %}is-active{% endif %}" href="{{ url_for('main.index') }}">Главная</a>
 
-        <span class="nav__spacer"></span>
+          {% if current_user.is_authenticated %}
+            <a class="nav__link {% if request.endpoint and request.endpoint.startswith('settings.') %}is-active{% endif %}" href="{{ url_for('settings.index') }}">Настройки</a>
+            <a class="nav__link {% if request.endpoint and request.endpoint.startswith('history.') %}is-active{% endif %}" href="{{ url_for('history.index') }}">История</a>
+            <a class="nav__link {% if request.endpoint and request.endpoint.startswith('assistants.') %}is-active{% endif %}" href="{{ url_for('assistants.index') }}">Помощники</a>
+          {% endif %}
 
-        {% if current_user.is_authenticated %}
-          <span class="nav__user">Вы вошли как {{ current_user.email }}</span>
-          <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="nav__link nav__button" type="submit">Выйти</button>
-          </form>
-        {% else %}
-          <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.login' %}is-active{% endif %}" href="{{ url_for('auth.login') }}">Вход</a>
-          <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.register' %}is-active{% endif %}" href="{{ url_for('auth.register') }}">Регистрация</a>
-        {% endif %}
-      </nav>
+          <span class="nav__spacer"></span>
+
+          {% if current_user.is_authenticated %}
+            <span class="nav__user">Вы вошли как {{ current_user.email }}</span>
+            <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="nav__link nav__button" type="submit">Выйти</button>
+            </form>
+          {% else %}
+            <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.login' %}is-active{% endif %}" href="{{ url_for('auth.login') }}">Вход</a>
+            <a class="nav__link {% if request.endpoint and request.endpoint == 'auth.register' %}is-active{% endif %}" href="{{ url_for('auth.register') }}">Регистрация</a>
+          {% endif %}
+        </nav>
     </div>
   </header>
 
