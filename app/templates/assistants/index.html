@@ -1,5 +1,83 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{ title }}</h1>
-<p>Здесь будет функционал страницы {{ title }}.</p>
+
+<p class="page__intro">
+  Управление AI-ассистентами для обработки новостей. Настройте провайдеров, модели и назначьте их на этапы обработки.
+</p>
+
+<div class="cards-grid">
+  <!-- Провайдеры -->
+  <div class="card">
+    <h2 class="card__title">🔌 Провайдеры API</h2>
+    <p class="card__sub">Управление поставщиками AI (OpenAI, Google, Anthropic)</p>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat__value">{{ providers|length }}</span>
+        <span class="stat__label">всего</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">{{ providers|selectattr('is_active')|list|length }}</span>
+        <span class="stat__label">активных</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">{{ providers|selectattr('api_key')|list|length }}</span>
+        <span class="stat__label">с ключами</span>
+      </div>
+    </div>
+
+    <a href="{{ url_for('assistants.providers') }}" class="btn btn--primary">
+      Настроить провайдеров
+    </a>
+  </div>
+
+  <!-- Модели -->
+  <div class="card">
+    <h2 class="card__title">🤖 Модели AI</h2>
+    <p class="card__sub">Просмотр и управление доступными моделями</p>
+
+    <div class="stats">
+      {% set total_models = providers|map(attribute='models')|map('list')|sum(start=[])|length %}
+      {% set active_models = providers|selectattr('is_active')|map(attribute='models')|map('list')|sum(start=[])|selectattr('is_active')|list|length %}
+
+      <div class="stat">
+        <span class="stat__value">{{ total_models }}</span>
+        <span class="stat__label">всего</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">{{ active_models }}</span>
+        <span class="stat__label">активных</span>
+      </div>
+    </div>
+
+    <a href="{{ url_for('assistants.models') }}" class="btn btn--primary">
+      Управление моделями
+    </a>
+  </div>
+
+  <!-- Этапы обработки -->
+  <div class="card">
+    <h2 class="card__title">⚙️ Этапы обработки</h2>
+    <p class="card__sub">Назначение моделей на этапы обработки новостей</p>
+
+    <div class="stages-preview">
+      {% for stage in stages %}
+        <div class="stage-item">
+          <span class="stage-item__name">{{ stage.display_name }}</span>
+          {% set assignment = stage.assignments.filter_by(is_active=True).first() %}
+          {% if assignment %}
+            <span class="badge badge--success">{{ assignment.model.display_name }}</span>
+          {% else %}
+            <span class="badge badge--warning">Не назначена</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <a href="{{ url_for('assistants.stages') }}" class="btn btn--primary">
+      Настроить этапы
+    </a>
+  </div>
+</div>
 {% endblock %}

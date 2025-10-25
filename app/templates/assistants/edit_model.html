@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  {% if model %}
+    Редактирование параметров модели <strong>{{ model.display_name }}</strong>
+  {% else %}
+    Добавление новой модели AI в систему
+  {% endif %}
+</p>
+
+<div class="card">
+  <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <div>
+      <label class="label" for="provider_id">Провайдер *</label>
+      <select id="provider_id" name="provider_id" class="select" required>
+        <option value="">-- Выберите провайдера --</option>
+        {% for provider in providers %}
+          <option value="{{ provider.id }}" 
+                  {% if model and model.provider_id == provider.id %}selected{% endif %}>
+            {{ provider.display_name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="help">Провайдер API, которому принадлежит модель</div>
+    </div>
+
+    <div>
+      <label class="label" for="name">Техническое имя *</label>
+      <input type="text" 
+             id="name" 
+             name="name" 
+             class="input" 
+             value="{{ model.name if model else '' }}"
+             placeholder="gpt-4o-2024-11-20"
+             required>
+      <div class="help">Уникальное имя модели для внутреннего использования (латиница, цифры, дефисы)</div>
+    </div>
+
+    <div>
+      <label class="label" for="display_name">Отображаемое имя *</label>
+      <input type="text" 
+             id="display_name" 
+             name="display_name" 
+             class="input" 
+             value="{{ model.display_name if model else '' }}"
+             placeholder="GPT-4o (Nov 2024)"
+             required>
+      <div class="help">Название модели, которое будет видно в интерфейсе</div>
+    </div>
+
+    <div>
+      <label class="label" for="api_identifier">API идентификатор *</label>
+      <input type="text" 
+             id="api_identifier" 
+             name="api_identifier" 
+             class="input" 
+             value="{{ model.api_identifier if model else '' }}"
+             placeholder="gpt-4o-2024-11-20"
+             required>
+      <div class="help">
+        Идентификатор модели в API провайдера (как её нужно передавать в запросе)
+        <br>
+        Примеры: 
+        <code>gpt-4o</code>, 
+        <code>gemini-2.0-flash-exp</code>, 
+        <code>claude-sonnet-4-5-20250929</code>
+      </div>
+    </div>
+
+    <div>
+      <label class="label" for="default_params">Параметры по умолчанию (JSON)</label>
+      <textarea id="default_params" 
+                name="default_params" 
+                class="textarea"
+                placeholder='{"temperature": 0.7, "max_tokens": 2000}'
+      >{{ model.default_params if model else '' }}</textarea>
+      <div class="help">
+        Необязательные параметры модели в формате JSON (temperature, max_tokens, top_p и т.д.)
+      </div>
+    </div>
+
+    <div>
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox" 
+               name="is_active" 
+               {% if not model or model.is_active %}checked{% endif %}>
+        <span>Модель активна</span>
+      </label>
+      <div class="help">Неактивные модели не будут доступны для назначения на этапы</div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <button type="submit" class="btn btn--primary">
+        {{ 'Обновить' if model else 'Создать' }}
+      </button>
+      <a href="{{ url_for('assistants.models') }}" class="btn btn--muted">Отмена</a>
+    </div>
+  </form>
+</div>
+
+{% if model %}
+<div class="card" style="border-color: var(--err); margin-top: 1rem;">
+  <h3 style="color: var(--err); margin-top: 0;">⚠️ Опасная зона</h3>
+  <p>Удаление модели необратимо. Убедитесь, что она не используется в активных назначениях.</p>
+  <form action="{{ url_for('assistants.delete_model', model_id=model.id) }}" 
+        method="post" 
+        onsubmit="return confirm('Вы уверены, что хотите удалить модель {{ model.display_name }}? Это действие необратимо!');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn--danger">Удалить модель</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  Назначьте AI-модели на каждый этап обработки новостей. Для каждого этапа можно указать основную модель и резервную (fallback).
+</p>
+
+{% for stage in stages %}
+<div class="card">
+  <h2 class="card__title">
+    {{ loop.index }}. {{ stage.display_name }}
+    {% set assignment = assignments.get(stage.id) %}
+    {% if assignment %}
+      <span class="badge badge--success">Настроено</span>
+    {% else %}
+      <span class="badge badge--warning">Не настроено</span>
+    {% endif %}
+  </h2>
+  <p class="card__sub">{{ stage.description }}</p>
+
+  {% if assignment %}
+    <!-- Текущее назначение -->
+    <div style="padding: 1rem; background: rgba(38,208,124,.1); border: 1px solid rgba(38,208,124,.3); border-radius: var(--radius-sm); margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>Основная модель:</strong> {{ assignment.model.display_name }}
+          <span class="help">({{ assignment.model.provider.display_name }})</span>
+          {% if assignment.fallback_model %}
+            <br>
+            <strong>Резервная модель:</strong> {{ assignment.fallback_model.display_name }}
+            <span class="help">({{ assignment.fallback_model.provider.display_name }})</span>
+          {% endif %}
+        </div>
+        <form action="{{ url_for('assistants.unassign_model', stage_id=stage.id) }}" 
+              method="post" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn--sm btn--danger">Удалить</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Форма назначения -->
+  <form action="{{ url_for('assistants.assign_model', stage_id=stage.id) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <div class="model-selector">
+      <div class="model-selector__row">
+        <div>
+          <label class="label" for="model_{{ stage.id }}">Основная модель</label>
+          <select id="model_{{ stage.id }}" name="model_id" class="select" required>
+            <option value="">-- Выберите модель --</option>
+            {% for model in models %}
+              <option value="{{ model.id }}" 
+                      {% if assignment and assignment.model_id == model.id %}selected{% endif %}>
+                {{ model.display_name }} ({{ model.provider.display_name }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="label" for="fallback_{{ stage.id }}">Резервная модель (опционально)</label>
+          <select id="fallback_{{ stage.id }}" name="fallback_model_id" class="select">
+            <option value="">-- Без резервной --</option>
+            {% for model in models %}
+              <option value="{{ model.id }}"
+                      {% if assignment and assignment.fallback_model_id == model.id %}selected{% endif %}>
+                {{ model.display_name }} ({{ model.provider.display_name }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn--primary" style="margin-top: 1.5rem;">
+            {{ 'Обновить' if assignment else 'Назначить' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endfor %}
+
+<div style="margin-top: 1.5rem;">
+  <a href="{{ url_for('assistants.index') }}" class="btn btn--muted">← Назад</a>
+</div>
+{% endblock %}

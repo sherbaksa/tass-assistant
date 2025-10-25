@@ -11,6 +11,9 @@ from app.blueprints.assistants import assistants_bp
 from app.extensions import db, migrate, login_manager, mail, csrf
 from app.auth.routes import auth_bp
 
+# Импорт моделей (чтобы Flask-Migrate их видел)
+from app import models
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(get_config())

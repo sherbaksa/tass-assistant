@@ -1,18 +1,35 @@
-# /home/mzeus2008/apps/tass_assistant/wsgi.py (фрагмент в начале)
+# wsgi.py - кросс-платформенная версия
 import os
 import sys
 from pathlib import Path
-PROJECT_HOME = '/home/mzeus2008/apps/tass_assistant'
-if PROJECT_HOME not in sys.path:
-    sys.path.insert(0, PROJECT_HOME)
+
+# Определяем, на какой платформе работаем
+IS_PYTHONANYWHERE = os.environ.get('PYTHONANYWHERE_DOMAIN') is not None or sys.platform == 'linux'
+
+if IS_PYTHONANYWHERE:
+    # Настройки для PythonAnywhere (Linux)
+    PROJECT_HOME = '/home/mzeus2008/apps/tass_assistant'
+    if PROJECT_HOME not in sys.path:
+        sys.path.insert(0, PROJECT_HOME)
+
 
 def load_env_file(path: str):
+    """Загрузка переменных окружения из файла (только для PythonAnywhere)"""
+    # На Windows пропускаем эту функцию
+    if not IS_PYTHONANYWHERE:
+        return
+
     p = Path(path).expanduser()
     log_path = Path("/home/mzeus2008/.env_loader.log")
+
     try:
         if not p.exists():
-            log_path.write_text(f"load_env_file: {p} does not exist\n")
+            try:
+                log_path.write_text(f"load_env_file: {p} does not exist\n")
+            except:
+                pass  # Игнорируем ошибки записи в лог
             return
+
         vars_found = []
         for line in p.read_text().splitlines():
             line = line.strip()
@@ -28,14 +45,26 @@ def load_env_file(path: str):
             vars_found.append(k)
             if k not in os.environ:
                 os.environ[k] = v
-        log_path.write_text("load_env_file: loaded variables: " + ",".join(vars_found) + "\n")
-    except Exception as e:
-        log_path.write_text("load_env_file: exception:\n" + repr(e) + "\n")
 
-# вызов загрузки
-load_env_file("~/.env_secrets")
-# ВАЖНО: импортируем из вашего пакета "app"
+        try:
+            log_path.write_text("load_env_file: loaded variables: " + ",".join(vars_found) + "\n")
+        except:
+            pass  # Игнорируем ошибки записи в лог
+
+    except Exception as e:
+        try:
+            log_path.write_text("load_env_file: exception:\n" + repr(e) + "\n")
+        except:
+            pass  # Игнорируем ошибки записи в лог
+
+
+# Вызов загрузки (только на PythonAnywhere)
+if IS_PYTHONANYWHERE:
+    load_env_file("~/.env_secrets")
+
+# Импорт приложения
 from app.app import create_app
+
 app = create_app()
 
 # Для совместимости с WSGI

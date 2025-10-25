@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  Настройте API ключи для провайдеров AI. Активные провайдеры с корректными ключами будут доступны для использования в системе.
+</p>
+
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Провайдер</th>
+        <th>Статус</th>
+        <th>API ключ</th>
+        <th>Моделей</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for provider in providers %}
+      <tr>
+        <td>
+          <strong>{{ provider.display_name }}</strong>
+          <div class="help">{{ provider.name }}</div>
+        </td>
+        <td>
+          <span class="status">
+            <span class="status-dot status-dot--{{ 'active' if provider.is_active else 'inactive' }}"></span>
+            {{ 'Активен' if provider.is_active else 'Неактивен' }}
+          </span>
+        </td>
+        <td>
+          {% if provider.api_key %}
+            <span class="badge badge--success">Настроен</span>
+          {% else %}
+            <span class="badge badge--warning">Не настроен</span>
+          {% endif %}
+        </td>
+        <td>
+          {{ provider.models.count() }}
+        </td>
+        <td>
+          <div class="table-actions">
+            <a href="{{ url_for('assistants.edit_provider', provider_id=provider.id) }}" 
+               class="btn btn--sm">
+              Настроить
+            </a>
+            {% if provider.api_key %}
+            <button type="button"
+                    class="btn btn--sm btn--muted test-connection-btn"
+                    data-provider-id="{{ provider.id }}"
+                    data-provider-name="{{ provider.display_name }}">
+              🔌 Тест
+            </button>
+            {% endif %}
+            <form action="{{ url_for('assistants.toggle_provider', provider_id=provider.id) }}"
+                  method="post" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn--sm btn--muted">
+                {{ 'Деактивировать' if provider.is_active else 'Активировать' }}
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top: 1.5rem;">
+  <a href="{{ url_for('assistants.index') }}" class="btn btn--muted">← Назад</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const testButtons = document.querySelectorAll('.test-connection-btn');
+
+  testButtons.forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const providerId = this.dataset.providerId;
+      const providerName = this.dataset.providerName;
+      const originalText = this.textContent;
+
+      // Блокируем кнопку
+      this.disabled = true;
+      this.textContent = '⏳';
+
+      try {
+        const response = await fetch(`/assistants/providers/${providerId}/test`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token() }}'
+          }
+        });
+
+        const data = await response.json();
+
+        // Показываем результат через alert (можно улучшить)
+        if (data.success) {
+          alert(`${providerName}\n\n${data.message}`);
+        } else {
+          alert(`${providerName}\n\n${data.message}`);
+        }
+
+      } catch (error) {
+        alert(`${providerName}\n\n❌ Ошибка: ${error.message}`);
+      } finally {
+        // Разблокируем кнопку
+        this.disabled = false;
+        this.textContent = originalText;
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

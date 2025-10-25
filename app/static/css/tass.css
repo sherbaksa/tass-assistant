@@ -151,3 +151,170 @@ body.theme{
   background: #1a2380;
   box-shadow: 0 4px 12px rgba(13, 22, 101, 0.5);
 }
+
+/* ============================================================================
+   Assistants - стили для управления AI-ассистентами
+   ============================================================================ */
+
+/* Введение на странице */
+.page__intro{
+  margin-bottom:2rem;
+  color:var(--tass-muted);
+  font-size:15px;
+}
+
+/* Сетка карточек */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+  gap:var(--gap);
+  margin-top:2rem;
+}
+
+/* Статистика внутри карточек */
+.stats{
+  display:flex;
+  gap:1.5rem;
+  margin:1.5rem 0;
+  padding:1rem;
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--tass-border);
+  border-radius:var(--radius-sm);
+}
+
+.stat{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.stat__value{
+  font-size:2rem;
+  font-weight:700;
+  color:var(--tass-primary-weak);
+  line-height:1;
+}
+
+.stat__label{
+  font-size:0.875rem;
+  color:var(--tass-muted);
+  margin-top:4px;
+}
+
+/* Превью этапов */
+.stages-preview{
+  margin:1.5rem 0;
+}
+
+.stage-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.75rem 0;
+  border-bottom:1px solid var(--tass-border);
+}
+
+.stage-item:last-child{
+  border-bottom:none;
+}
+
+.stage-item__name{
+  font-weight:500;
+  color:var(--tass-text);
+}
+
+/* Бейджи с цветами */
+.badge--success{
+  background:rgba(38,208,124,.15);
+  color:var(--ok);
+  border-color:rgba(38,208,124,.3);
+}
+
+.badge--warning{
+  background:rgba(255,176,32,.15);
+  color:var(--warn);
+  border-color:rgba(255,176,32,.3);
+}
+
+.badge--inactive{
+  background:rgba(157,176,225,.1);
+  color:var(--tass-muted);
+  border-color:var(--tass-border);
+}
+
+/* Действия в таблицах */
+.table-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.btn--sm{
+  padding:6px 12px;
+  font-size:13px;
+}
+
+.btn--danger{
+  background:linear-gradient(180deg, rgba(255,82,82,.2), rgba(255,82,82,.1));
+  border-color:rgba(255,82,82,.3);
+  color:var(--err);
+}
+
+.btn--danger:hover{
+  background:linear-gradient(180deg, rgba(255,82,82,.3), rgba(255,82,82,.2));
+}
+
+/* Статус-индикаторы */
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+}
+
+.status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  display:inline-block;
+}
+
+.status-dot--active{
+  background:var(--ok);
+  box-shadow:0 0 8px rgba(38,208,124,.4);
+}
+
+.status-dot--inactive{
+  background:var(--tass-muted);
+  opacity:.3;
+}
+
+/* Формы выбора моделей */
+.model-selector{
+  display:grid;
+  gap:1rem;
+  margin-top:1rem;
+}
+
+.model-selector__row{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:1rem;
+  align-items:end;
+}
+
+/* Адаптивность */
+@media (max-width: 860px){
+  .cards-grid{
+    grid-template-columns:1fr;
+  }
+  .stats{
+    gap:1rem;
+  }
+  .stat__value{
+    font-size:1.5rem;
+  }
+  .model-selector__row{
+    grid-template-columns:1fr;
+  }
+}

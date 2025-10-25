@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  Укажите API ключ и настройки для провайдера <strong>{{ provider.display_name }}</strong>.
+  Ключ будет использоваться для доступа к моделям этого провайдера.
+</p>
+
+<div class="card">
+  <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div>
+      <label class="label" for="api_key">API ключ</label>
+      <input type="text"
+             id="api_key"
+             name="api_key"
+             class="input"
+             value="{{ provider.api_key or '' }}"
+             placeholder="sk-...">
+      <div class="help">
+        {% if provider.name == 'openai' %}
+          Получите ключ на <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>
+        {% elif provider.name == 'google' %}
+          Получите ключ на <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+        {% elif provider.name == 'anthropic' %}
+          Получите ключ на <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <label class="label" for="base_url">Base URL (опционально)</label>
+      <input type="text"
+             id="base_url"
+             name="base_url"
+             class="input"
+             value="{{ base_url or '' }}"
+             placeholder="https://api.openai.com/v1">
+      <div class="help">
+        Укажите альтернативный URL API (для прокси или локального сервера).
+        <br>
+        Примеры:
+        <code>https://my-proxy.com/v1</code>,
+        <code>http://localhost:8080/v1</code>
+        <br>
+        Если не указано, будет использован стандартный URL провайдера.
+      </div>
+    </div>
+
+    <div>
+      <label class="label" for="additional_config">Дополнительная конфигурация (JSON)</label>
+      <textarea id="additional_config"
+                name="additional_config"
+                class="textarea"
+                placeholder='{"organization_id": "org-...", "project_id": "..."}'
+      >{{ provider.additional_config or '' }}</textarea>
+      <div class="help">
+        Необязательные параметры в формате JSON (organization_id, project_id и т.д.)
+        <br>
+        <strong>Внимание:</strong> Если указан Base URL выше, он автоматически добавится в эту конфигурацию.
+      </div>
+    </div>
+
+    <div>
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox"
+               name="is_active"
+               {% if provider.is_active %}checked{% endif %}>
+        <span>Провайдер активен</span>
+      </label>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <button type="submit" class="btn btn--primary">Сохранить</button>
+      <button type="button" class="btn btn--muted" id="testConnectionBtn">🔌 Проверить подключение</button>
+      <a href="{{ url_for('assistants.providers') }}" class="btn btn--muted">Отмена</a>
+    </div>
+  </form>
+
+  <!-- Результат теста подключения -->
+  <div id="testResult" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: var(--radius-sm);"></div>
+</div>
+
+<script>
+document.getElementById('testConnectionBtn').addEventListener('click', async function() {
+  const btn = this;
+  const resultDiv = document.getElementById('testResult');
+
+  // Блокируем кнопку
+  btn.disabled = true;
+  btn.textContent = '⏳ Проверка...';
+
+  // Показываем индикатор загрузки
+  resultDiv.style.display = 'block';
+  resultDiv.style.background = 'rgba(255,255,255,.02)';
+  resultDiv.style.border = '1px solid var(--tass-border)';
+  resultDiv.textContent = '⏳ Тестирование подключения к API...';
+
+  try {
+    const response = await fetch('{{ url_for("assistants.test_provider", provider_id=provider.id) }}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token() }}'
+      }
+    });
+
+    const data = await response.json();
+
+    // Показываем результат
+    if (data.success) {
+      resultDiv.style.background = 'rgba(38,208,124,.15)';
+      resultDiv.style.border = '1px solid rgba(38,208,124,.3)';
+      resultDiv.style.color = 'var(--ok)';
+    } else {
+      resultDiv.style.background = 'rgba(255,82,82,.15)';
+      resultDiv.style.border = '1px solid rgba(255,82,82,.3)';
+      resultDiv.style.color = 'var(--err)';
+    }
+
+    resultDiv.textContent = data.message;
+
+  } catch (error) {
+    resultDiv.style.background = 'rgba(255,82,82,.15)';
+    resultDiv.style.border = '1px solid rgba(255,82,82,.3)';
+    resultDiv.style.color = 'var(--err)';
+    resultDiv.textContent = '❌ Ошибка выполнения запроса: ' + error.message;
+  } finally {
+    // Разблокируем кнопку
+    btn.disabled = false;
+    btn.textContent = '🔌 Проверить подключение';
+  }
+});
+</script>
+
+<div class="card" style="margin-top: 1rem;">
+  <h3>💡 Справка по провайдерам</h3>
+
+  {% if provider.name == 'openai' %}
+    <p><strong>OpenAI:</strong></p>
+    <ul>
+      <li>Стандартный URL: <code>https://api.openai.com/v1</code></li>
+      <li>Для прокси укажите альтернативный Base URL</li>
+      <li>Дополнительные параметры: <code>organization_id</code>, <code>project_id</code></li>
+    </ul>
+  {% elif provider.name == 'google' %}
+    <p><strong>Google AI (Gemini):</strong></p>
+    <ul>
+      <li>Стандартный URL: <code>https://generativelanguage.googleapis.com</code></li>
+      <li>API ключ добавляется в параметры запроса</li>
+      <li>Дополнительные параметры: <code>project_id</code></li>
+    </ul>
+  {% elif provider.name == 'anthropic' %}
+    <p><strong>Anthropic (Claude):</strong></p>
+    <ul>
+      <li>Стандартный URL: <code>https://api.anthropic.com</code></li>
+      <li>Для прокси укажите альтернативный Base URL</li>
+      <li>Требуется версия API в заголовках</li>
+    </ul>
+  {% endif %}
+</div>
+{% endblock %}

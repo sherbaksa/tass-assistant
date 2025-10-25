@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  Список всех доступных моделей AI. Активируйте нужные модели для использования в системе обработки новостей.
+</p>
+
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <div>
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox"
+               {% if show_inactive %}checked{% endif %}
+               onchange="window.location.href='{{ url_for('assistants.models', show_inactive='1' if not show_inactive else '0') }}'">
+        <span>Показать неактивные модели</span>
+      </label>
+    </div>
+    <a href="{{ url_for('assistants.create_model') }}" class="btn btn--primary">+ Добавить модель</a>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Модель</th>
+        <th>Провайдер</th>
+        <th>API идентификатор</th>
+        <th>Статус</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for model in models %}
+      <tr {% if not model.is_active %}style="opacity: 0.5;"{% endif %}>
+        <td>
+          <strong>{{ model.display_name }}</strong>
+          <div class="help">{{ model.name }}</div>
+        </td>
+        <td>
+          <span class="badge {% if model.provider.is_active %}badge--success{% else %}badge--inactive{% endif %}">
+            {{ model.provider.display_name }}
+          </span>
+        </td>
+        <td>
+          <code style="font-size: 12px; color: var(--tass-muted);">{{ model.api_identifier }}</code>
+        </td>
+        <td>
+          <span class="status">
+            <span class="status-dot status-dot--{{ 'active' if model.is_active and model.provider.is_active else 'inactive' }}"></span>
+            {% if model.is_active and model.provider.is_active %}
+              Активна
+            {% elif model.is_active and not model.provider.is_active %}
+              Провайдер неактивен
+            {% else %}
+              Неактивна
+            {% endif %}
+          </span>
+        </td>
+        <td>
+          <div class="table-actions">
+            <a href="{{ url_for('assistants.edit_model', model_id=model.id) }}"
+               class="btn btn--sm">
+              Редактировать
+            </a>
+            <form action="{{ url_for('assistants.toggle_model', model_id=model.id) }}"
+                  method="post" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn--sm btn--muted">
+                {{ 'Деактивировать' if model.is_active else 'Активировать' }}
+              </button>
+            </form>
+            <form action="{{ url_for('assistants.delete_model', model_id=model.id) }}"
+                  method="post"
+                  style="display:inline;"
+                  onsubmit="return confirm('Удалить модель {{ model.display_name }}?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn--sm btn--danger">
+                Удалить
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--tass-muted);">
+          Моделей не найдено. <a href="{{ url_for('assistants.create_model') }}">Добавить модель</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top: 1.5rem;">
+  <a href="{{ url_for('assistants.index') }}" class="btn btn--muted">← Назад</a>
+</div>
+{% endblock %}
