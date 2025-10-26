@@ -51,9 +51,11 @@
       </div>
     </div>
 
-    <a href="{{ url_for('assistants.models') }}" class="btn btn--primary">
-      Управление моделями
-    </a>
+    <div style="margin-top: auto;">
+      <a href="{{ url_for('assistants.models') }}" class="btn btn--primary">
+        Управление моделями
+      </a>
+    </div>
   </div>
 
   <!-- Этапы обработки -->
@@ -75,9 +77,11 @@
       {% endfor %}
     </div>
 
-    <a href="{{ url_for('assistants.stages') }}" class="btn btn--primary">
-      Настроить этапы
-    </a>
+    <div style="margin-top: auto;">
+      <a href="{{ url_for('assistants.stages') }}" class="btn btn--primary">
+        Настроить этапы
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}

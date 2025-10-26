@@ -49,6 +49,9 @@ body.theme{
   box-shadow:var(--shadow); padding:22px;
 }
 .card + .card{margin-top:var(--gap)}
+
+/* Убираем верхний отступ для карточек в сетке */
+.cards-grid .card + .card{margin-top:0}
 .card__title{margin:0 0 8px; font-size:20px}
 .card__sub{margin:0 0 16px; color:var(--tass-muted)}
 
@@ -60,7 +63,16 @@ body.theme{
 }
 .btn:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.25)}
 .btn:active{transform:translateY(0)}
-.btn--primary{background:linear-gradient(180deg, var(--tass-primary), #0f2fff); border-color:transparent; color:#fff}
+.btn--primary{
+  background: #0D1665;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.btn--primary:hover{
+  background: #1a2380;
+  box-shadow: 0 4px 12px rgba(13, 22, 101, 0.5);
+}
 .btn--muted{background:transparent}
 
 /* Forms */
@@ -169,6 +181,10 @@ body.theme{
   grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
   gap:var(--gap);
   margin-top:2rem;
+}
+
+.cards-grid .card{
+  height:100%;
 }
 
 /* Статистика внутри карточек */
