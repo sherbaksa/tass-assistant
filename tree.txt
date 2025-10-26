@@ -1,0 +1,109 @@
+.
+├── __pycache__
+│   └── wsgi.cpython-313.pyc
+├── app
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-313.pyc
+│   │   ├── app.cpython-313.pyc
+│   │   ├── config.cpython-313.pyc
+│   │   ├── extensions.cpython-313.pyc
+│   │   └── models.cpython-313.pyc
+│   ├── app.py
+│   ├── auth
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-313.pyc
+│   │   │   ├── decorators.cpython-313.pyc
+│   │   │   ├── emails.cpython-313.pyc
+│   │   │   ├── forms.cpython-313.pyc
+│   │   │   ├── routes.cpython-313.pyc
+│   │   │   └── services.cpython-313.pyc
+│   │   ├── decorators.py
+│   │   ├── emails.py
+│   │   ├── forms.py
+│   │   ├── routes.py
+│   │   └── services.py
+│   ├── blueprints
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-313.pyc
+│   │   │   ├── assistants.cpython-313.pyc
+│   │   │   ├── history.cpython-313.pyc
+│   │   │   ├── main.cpython-313.pyc
+│   │   │   └── settings.cpython-313.pyc
+│   │   ├── assistants.py
+│   │   ├── history.py
+│   │   ├── main.py
+│   │   ├── settings.py
+│   │   └── test
+│   ├── config.py
+│   ├── extensions.py
+│   ├── instance
+│   │   └── app.db
+│   ├── models.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-313.pyc
+│   │   │   └── ai_providers.cpython-313.pyc
+│   │   ├── ai_providers.py
+│   │   └── test
+│   ├── static
+│   │   ├── css
+│   │   │   └── tass.css
+│   │   └── js
+│   │       └── app.js
+│   └── templates
+│       ├── assistants
+│       │   ├── edit_model.html
+│       │   ├── edit_provider.html
+│       │   ├── index.html
+│       │   ├── models.html
+│       │   ├── providers.html
+│       │   └── stages.html
+│       ├── auth
+│       │   ├── email_confirm.html
+│       │   ├── email_reset.html
+│       │   ├── forgot_password.html
+│       │   ├── login.html
+│       │   ├── register.html
+│       │   └── reset_password.html
+│       ├── base.html
+│       ├── history
+│       │   └── index.html
+│       ├── macros
+│       │   └── flash.html
+│       ├── main
+│       │   └── index.html
+│       └── settings
+│           ├── index.html
+│           └── users.html
+├── app.db
+├── app.db.backup
+├── app.db.clone
+├── datadump.json
+├── init_db.py
+├── instance
+│   └── app.db
+├── manage.py
+├── migrations
+│   ├── README
+│   ├── __pycache__
+│   │   └── env.cpython-313.pyc
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       ├── 4a8896fb582b_init_auth_models.py
+│       ├── 5ab070e24621_add_ai_assistants_system_tables.py
+│       ├── __pycache__
+│       │   ├── 4a8896fb582b_init_auth_models.cpython-313.pyc
+│       │   ├── 5ab070e24621_add_ai_assistants_system_tables.cpython-313.pyc
+│       │   └── b044090790e7_add_is_admin_field.cpython-313.pyc
+│       └── b044090790e7_add_is_admin_field.py
+├── requirements.txt
+├── tree.txt
+└── wsgi.py
+
+25 directories, 81 files
