@@ -42,6 +42,25 @@ def toggle_admin(user_id):
     return redirect(url_for('settings.users'))
 
 
+@settings_bp.route('/users/<int:user_id>/toggle-active', methods=['POST'])
+@login_required
+@admin_required
+def toggle_active(user_id):
+    """Активировать/деактивировать пользователя (только для админов)"""
+    user = User.query.get_or_404(user_id)
+
+    # Нельзя деактивировать самого себя
+    if user.id == current_user.id:
+        flash("Вы не можете изменить свой собственный статус активности", "warning")
+        return redirect(url_for('settings.users'))
+
+    user.is_active = not user.is_active
+    db.session.commit()
+
+    action = "активирован" if user.is_active else "деактивирован"
+    flash(f"Пользователь {user.email} {action}.", "success")
+    return redirect(url_for('settings.users'))
+
 @settings_bp.route('/registration/toggle', methods=['POST'])
 @login_required
 @admin_required

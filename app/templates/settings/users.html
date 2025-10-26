@@ -61,17 +61,30 @@
           {{ user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else '—' }}
         </td>
         <td>
-          {% if user.id != current_user.id %}
-          <form action="{{ url_for('settings.toggle_admin', user_id=user.id) }}" method="post" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn--muted" style="padding: 6px 12px; font-size: 14px;">
-              {% if user.is_admin %}Убрать права{% else %}Назначить админом{% endif %}
-            </button>
-          </form>
-          {% else %}
-          <span style="color: var(--tass-muted);">—</span>
-          {% endif %}
-        </td>
+  {% if user.id != current_user.id %}
+  <!-- Форма переключения прав администратора -->
+  <form action="{{ url_for('settings.toggle_admin', user_id=user.id) }}" method="post" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn--muted" style="padding: 6px 12px; font-size: 14px;">
+      {% if user.is_admin %}Убрать права{% else %}Назначить админом{% endif %}
+    </button>
+  </form>
+
+  <!-- Отступ между кнопками -->
+  <span style="display:inline-block; width:8px;"></span>
+
+  <!-- Форма переключения активности -->
+  <form action="{{ url_for('settings.toggle_active', user_id=user.id) }}" method="post" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn {% if user.is_active %}btn--muted{% else %}btn--admin{% endif %}" style="padding: 6px 12px; font-size: 14px;">
+      {% if user.is_active %}Деактивировать{% else %}Активировать{% endif %}
+    </button>
+  </form>
+  {% else %}
+  <span style="color: var(--tass-muted);">—</span>
+  {% endif %}
+</td>
+
       </tr>
       {% endfor %}
     </tbody>
