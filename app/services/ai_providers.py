@@ -669,3 +669,92 @@ class AIProviderFactory:
     def get_available_providers(cls) -> List[str]:
         """Получить список доступных провайдеров"""
         return list(cls._providers.keys())
+
+
+def send_ai_request(model_id: int,
+                    messages: List[Dict[str, str]],
+                    use_fallback: bool = True,
+                    **kwargs) -> Dict[str, Any]:
+    """
+    Отправить запрос к AI модели с поддержкой fallback
+
+    Args:
+        model_id: ID модели из БД (AIModel.id)
+        messages: Список сообщений в формате [{"role": "user", "content": "..."}]
+        use_fallback: Использовать fallback-модель при ошибке
+        **kwargs: Дополнительные параметры (temperature, max_tokens, etc.)
+
+    Returns:
+        Dict с результатом запроса
+    """
+    from app.models import AIModel, Provider
+
+    # Загружаем модель из БД
+    model = AIModel.query.get(model_id)
+    if not model:
+        return {
+            "success": False,
+            "content": None,
+            "model": None,
+            "usage": {},
+            "error": f"Модель с ID {model_id} не найдена"
+        }
+
+    # Проверяем активность модели и провайдера
+    if not model.is_active or not model.provider.is_active:
+        return {
+            "success": False,
+            "content": None,
+            "model": model.api_identifier,
+            "usage": {},
+            "error": "Модель или провайдер неактивны"
+        }
+
+    # Мержим default_params модели с переданными kwargs
+    params = {}
+    if model.default_params:
+        try:
+            params = json.loads(model.default_params)
+        except json.JSONDecodeError:
+            pass
+    params.update(kwargs)
+
+    # Создаём провайдер
+    try:
+        provider = AIProviderFactory.create_from_db_provider(model.provider)
+    except AIProviderError as e:
+        return {
+            "success": False,
+            "content": None,
+            "model": model.api_identifier,
+            "usage": {},
+            "error": str(e)
+        }
+
+    # Отправляем запрос
+    result = provider.send_message(model.api_identifier, messages, **params)
+
+    # Если ошибка и есть fallback - пробуем fallback
+    if not result["success"] and use_fallback:
+        # Ищем fallback в stage_assignments
+        from app.models import StageAssignment
+
+        assignment = StageAssignment.query.filter_by(
+            model_id=model_id,
+            is_active=True
+        ).first()
+
+        if assignment and assignment.fallback_model_id:
+            fallback_result = send_ai_request(
+                model_id=assignment.fallback_model_id,
+                messages=messages,
+                use_fallback=False,  # Не используем вложенный fallback
+                **kwargs
+            )
+
+            if fallback_result["success"]:
+                fallback_result["fallback_used"] = True
+                fallback_result["original_error"] = result["error"]
+                return fallback_result
+
+    return result
