@@ -1,4 +1,5 @@
 .
+├── README.md
 ├── __pycache__
 │   └── wsgi.cpython-313.pyc
 ├── app
@@ -46,8 +47,10 @@
 │   │   ├── __init__.py
 │   │   ├── __pycache__
 │   │   │   ├── __init__.cpython-313.pyc
-│   │   │   └── ai_providers.cpython-313.pyc
+│   │   │   ├── ai_providers.cpython-313.pyc
+│   │   │   └── prompt_manager.cpython-313.pyc
 │   │   ├── ai_providers.py
+│   │   ├── prompt_manager.py
 │   │   └── test
 │   ├── static
 │   │   ├── css
@@ -77,13 +80,18 @@
 │       ├── main
 │       │   └── index.html
 │       └── settings
+│           ├── edit_my_prompt.html
+│           ├── edit_prompt.html
 │           ├── index.html
+│           ├── my_prompts.html
+│           ├── prompts.html
 │           └── users.html
 ├── app.db
 ├── app.db.backup
 ├── app.db.clone
 ├── datadump.json
 ├── init_db.py
+├── init_prompts.py
 ├── instance
 │   └── app.db
 ├── manage.py
@@ -96,14 +104,17 @@
 │   ├── script.py.mako
 │   └── versions
 │       ├── 4a8896fb582b_init_auth_models.py
+│       ├── 54d8ced98e88_add_system_and_user_prompts_tables.py
 │       ├── 5ab070e24621_add_ai_assistants_system_tables.py
 │       ├── __pycache__
 │       │   ├── 4a8896fb582b_init_auth_models.cpython-313.pyc
+│       │   ├── 54d8ced98e88_add_system_and_user_prompts_tables.cpython-313.pyc
 │       │   ├── 5ab070e24621_add_ai_assistants_system_tables.cpython-313.pyc
 │       │   └── b044090790e7_add_is_admin_field.cpython-313.pyc
 │       └── b044090790e7_add_is_admin_field.py
 ├── requirements.txt
+├── test_ai_api.py
 ├── tree.txt
 └── wsgi.py
 
-25 directories, 81 files
+25 directories, 92 files
