@@ -39,7 +39,7 @@
           <span class="nav__spacer"></span>
 
           {% if current_user.is_authenticated %}
-            <span class="nav__user">Вы вошли как {{ current_user.email }}</span>
+            <span class="nav__user">Вы вошли как<br>{{ current_user.email }}</span>
             <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button class="nav__link nav__button" type="submit">Выйти</button>
