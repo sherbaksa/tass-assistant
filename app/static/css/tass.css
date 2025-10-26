@@ -346,3 +346,339 @@ textarea.form-control {
   max-width: 100% !important;
   resize: vertical;
 }
+/* ============================================================================
+   News Processing - стили для формы обработки новостей
+   ============================================================================ */
+
+/* Контейнер чекбоксов этапов */
+.stages-selector {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.stage-checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.stage-checkbox:hover {
+  background: rgba(255,255,255,.03);
+}
+
+.stage-checkbox input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.stage-checkbox input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stage-checkbox__label {
+  font-weight: 500;
+  color: var(--tass-text);
+  display: flex;
+  align-items: center;
+}
+
+.stage-checkbox__desc {
+  font-size: 13px;
+  color: var(--tass-muted);
+  margin-left: 26px;
+}
+
+/* Результаты обработки */
+.result-item {
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.result-item--success {
+  border-color: rgba(38,208,124,.3);
+}
+
+.result-item--error {
+  border-color: rgba(255,82,82,.3);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.result-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--tass-text);
+}
+
+.result-content {
+  color: var(--tass-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.result-error {
+  color: var(--err);
+  font-size: 14px;
+}
+
+.result-meta {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tass-border);
+  font-size: 13px;
+  color: var(--tass-muted);
+}
+/* ============================================================================
+   News Processing - стили для формы обработки новостей
+   ============================================================================ */
+
+/* Контейнер чекбоксов этапов */
+.stages-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.stage-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--tass-border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  background: rgba(255,255,255,.02);
+}
+
+.stage-checkbox:hover {
+  background: rgba(255,255,255,.05);
+  border-color: var(--tass-primary-weak);
+}
+
+.stage-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.stage-checkbox input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stage-checkbox.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255,255,255,.01);
+}
+
+.stage-checkbox__label {
+  font-weight: 500;
+  color: var(--tass-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Результаты обработки */
+.result-item {
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.result-item--success {
+  border-color: rgba(38,208,124,.3);
+}
+
+.result-item--error {
+  border-color: rgba(255,82,82,.3);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.result-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--tass-text);
+}
+
+.result-content {
+  color: var(--tass-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.result-error {
+  color: var(--err);
+  font-size: 14px;
+}
+
+.result-meta {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tass-border);
+  font-size: 13px;
+  color: var(--tass-muted);
+}
+/* ============================================================================
+   News Processing - стили для формы обработки новостей
+   ============================================================================ */
+
+/* Placeholder для contenteditable */
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: var(--tass-muted);
+  opacity: 0.6;
+}
+
+[contenteditable]:focus {
+  outline: none;
+}
+
+/* Контейнер чекбоксов этапов */
+.stages-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.stage-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--tass-border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  background: rgba(255,255,255,.02);
+}
+
+.stage-checkbox:hover {
+  background: rgba(255,255,255,.05);
+  border-color: var(--tass-primary-weak);
+}
+
+.stage-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.stage-checkbox input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stage-checkbox.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255,255,255,.01);
+}
+
+.stage-checkbox__label {
+  font-weight: 500;
+  color: var(--tass-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Результаты обработки */
+.result-item {
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.result-item--success {
+  border-color: rgba(38,208,124,.3);
+}
+
+.result-item--error {
+  border-color: rgba(255,82,82,.3);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.result-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--tass-text);
+}
+
+.result-content {
+  color: var(--tass-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.result-error {
+  color: var(--err);
+  font-size: 14px;
+}
+
+.result-meta {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tass-border);
+  font-size: 13px;
+  color: var(--tass-muted);
+}

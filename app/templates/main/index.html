@@ -13,27 +13,99 @@
   </div>
 
   {% if current_user.is_authenticated %}
-    <hr>
+    <hr style="border: none; border-top: 1px solid var(--tass-border); margin: 2rem 0;">
+
+    <!-- Форма обработки новости -->
+    <div class="card">
+      <h2 class="card__title">Обработка новости</h2>
+      <p class="card__sub">Вставьте текст новости и выберите этапы обработки</p>
+
+      <form id="newsProcessingForm" class="form" data-action-url="{{ url_for('main.process_news') }}">
+        <div>
+          <label class="label" for="newsText">Текст новости</label>
+          <div
+            id="newsText"
+            class="textarea"
+            contenteditable="true"
+            data-placeholder="Вставьте сюда текст новости для обработки..."
+            style="min-height: 200px;"
+          ></div>
+          <p class="help">Поддерживается форматированный текст (можно вставить из Word, Google Docs и т.д.)</p>
+        </div>
+
+        <div>
+          <label class="label">Этапы обработки</label>
+          {% if stages %}
+            <div class="stages-selector">
+              {% for stage in stages %}
+                <label
+                  class="stage-checkbox"
+                  data-stage-name="{{ stage.name }}"
+                  {% if stage.description %}title="{{ stage.description }}"{% endif %}
+                >
+                  <input
+                    type="checkbox"
+                    name="stage_ids"
+                    value="{{ stage.id }}"
+                    data-stage-name="{{ stage.name }}"
+                    {% if not stage.has_model %}disabled{% endif %}
+                  >
+                  <span class="stage-checkbox__label">
+                    {{ stage.display_name }}
+                    {% if not stage.has_model %}
+                      <span class="badge badge--warning">Нет модели</span>
+                    {% endif %}
+                  </span>
+                </label>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="help" style="color: var(--warn);">Нет доступных этапов. Обратитесь к администратору.</p>
+          {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button type="submit" class="btn btn--primary" id="submitBtn">
+            Обработать новость
+          </button>
+          <span id="processingStatus" class="help" style="display: none;">
+            Обработка...
+          </span>
+        </div>
+      </form>
+    </div>
+
+    <!-- Результаты обработки -->
+    <div id="resultsContainer" style="display: none; margin-top: 2rem;">
+      <div class="card">
+        <h2 class="card__title">Результаты обработки</h2>
+        <div id="resultsContent"></div>
+      </div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid var(--tass-border); margin: 2rem 0;">
 
     <h2>Доступные функции</h2>
-    <div class="features-grid">
-      <div class="feature-card">
+    <div class="cards-grid">
+      <div class="card">
         <h3>⚙️ Настройки</h3>
         <p>Управление параметрами системы и вашим профилем.</p>
-        <a href="{{ url_for('settings.index') }}">Перейти к настройкам →</a>
+        <a href="{{ url_for('settings.index') }}" class="btn btn--muted">Перейти к настройкам →</a>
       </div>
 
-      <div class="feature-card">
+      <div class="card">
         <h3>📜 История</h3>
         <p>Просмотр истории обработанных материалов.</p>
-        <a href="{{ url_for('history.index') }}">Посмотреть историю →</a>
+        <a href="{{ url_for('history.index') }}" class="btn btn--muted">Посмотреть историю →</a>
       </div>
 
-      <div class="feature-card">
-        <h3>🤖 Помощники</h3>
-        <p>AI-ассистенты для обработки контента.</p>
-        <a href="{{ url_for('assistants.index') }}">Открыть помощники →</a>
-      </div>
+      {% if current_user.is_admin %}
+        <div class="card">
+          <h3>🤖 Помощники</h3>
+          <p>AI-ассистенты для обработки контента.</p>
+          <a href="{{ url_for('assistants.index') }}" class="btn btn--muted">Открыть помощники →</a>
+        </div>
+      {% endif %}
     </div>
   {% endif %}
 {% endblock %}
