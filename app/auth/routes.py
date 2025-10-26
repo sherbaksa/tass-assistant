@@ -39,10 +39,18 @@ def register():
             email=email,
             password_hash=hash_password(form.password.data),
             is_active=False,
-            is_admin=is_first_user  # Первый пользователь автоматически становится админом
+            is_admin=is_first_user
         )
         db.session.add(user)
         db.session.commit()
+
+        # Инициализируем промпты для нового пользователя
+        from app.services.prompt_manager import PromptManager
+        try:
+            PromptManager.initialize_user_prompts(user.id)
+        except Exception as e:
+            # Логируем ошибку, но не прерываем регистрацию
+            print(f"Warning: Failed to initialize prompts for user {user.id}: {e}")
 
         et = create_email_token(user, "confirm", hours=48)
         from app.auth.emails import render_confirm_email

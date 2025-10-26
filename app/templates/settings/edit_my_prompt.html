@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ stage.display_name }}</h2>
+        <a href="{{ url_for('settings.my_prompts') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+
+    {% if stage.description %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>О этапе:</strong> {{ stage.description }}
+    </div>
+    {% endif %}
+
+    {% if user_prompt.is_customized %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>Внимание:</strong> Вы используете модифицированный промпт. 
+        Если хотите вернуться к системному значению, нажмите "Сбросить" в списке промптов.
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12 col-xl-10 col-xxl-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="mb-3">
+                            <label for="prompt_text" class="form-label">
+                                <i class="bi bi-file-text"></i>
+                                Текст промпта <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control font-monospace"
+                                      id="prompt_text"
+                                      name="prompt_text"
+                                      rows="15"
+                                      required>{{ user_prompt.prompt_text }}</textarea>
+                            <div class="form-text">
+                                Этот промпт будет использоваться как системная инструкция для AI модели
+                                при обработке ваших новостей на данном этапе.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-lightbulb"></i>
+                            <strong>Совет:</strong> Вы можете адаптировать промпт под свои нужды,
+                            добавив специфичные требования или изменив стиль изложения.
+                            Если результат вас не устроит, всегда можно вернуться к системному значению.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i>
+                                Сохранить изменения
+                            </button>
+                            <a href="{{ url_for('settings.my_prompts') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i>
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i>
+                    История
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>Статус:</strong>
+                        {% if user_prompt.is_customized %}
+                            <span class="badge bg-warning text-dark">Модифицирован</span>
+                        {% else %}
+                            <span class="badge bg-success">Системный</span>
+                        {% endif %}
+                    </p>
+                    <p class="mb-1"><strong>Создан:</strong> {{ user_prompt.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                    <p class="mb-0"><strong>Обновлён:</strong> {{ user_prompt.updated_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

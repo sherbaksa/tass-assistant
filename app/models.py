@@ -161,3 +161,48 @@ class StageAssignment(TimestampMixin, db.Model):
 
     def __repr__(self):
         return f"<StageAssignment stage={self.stage.name if self.stage else None} model={self.model.name if self.model else None}>"
+
+
+# ============================================================================
+# Модели для управления системными промптами
+# ============================================================================
+
+class SystemPrompt(TimestampMixin, db.Model):
+    """
+    Системные промпты для этапов обработки (настраиваются администратором)
+    """
+    __tablename__ = "system_prompts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    stage_id = db.Column(db.Integer, db.ForeignKey("stages.id", ondelete="CASCADE"), nullable=False, unique=True)
+    prompt_text = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)  # Описание назначения промпта
+
+    # Relationships
+    stage = db.relationship("Stage", backref=db.backref("system_prompt", uselist=False))
+
+    def __repr__(self):
+        return f"<SystemPrompt id={self.id} stage={self.stage.name if self.stage else None}>"
+
+
+class UserPrompt(TimestampMixin, db.Model):
+    """
+    Пользовательские промпты (копируются из системных, могут быть изменены пользователем)
+    """
+    __tablename__ = "user_prompts"
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'stage_id', name='uq_user_stage_prompt'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    stage_id = db.Column(db.Integer, db.ForeignKey("stages.id", ondelete="CASCADE"), nullable=False)
+    prompt_text = db.Column(db.Text, nullable=False)
+    is_customized = db.Column(db.Boolean, nullable=False, default=False)  # True если пользователь изменял
+
+    # Relationships
+    user = db.relationship("User", backref=db.backref("user_prompts", lazy="dynamic", cascade="all, delete-orphan"))
+    stage = db.relationship("Stage", backref=db.backref("user_prompts", lazy="dynamic"))
+
+    def __repr__(self):
+        return f"<UserPrompt id={self.id} user_id={self.user_id} stage={self.stage.name if self.stage else None} customized={self.is_customized}>"

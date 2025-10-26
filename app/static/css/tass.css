@@ -334,3 +334,15 @@ body.theme{
     grid-template-columns:1fr;
   }
 }
+/* Промпты - широкое поле для редактирования */
+.font-monospace {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+textarea.form-control {
+  width: 100% !important;
+  max-width: 100% !important;
+  resize: vertical;
+}

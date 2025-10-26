@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ stage.display_name }}</h2>
+        <a href="{{ url_for('settings.prompts') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+
+    {% if stage.description %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>О этапе:</strong> {{ stage.description }}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12 col-xl-10 col-xxl-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="bi bi-card-text"></i>
+                                Описание назначения промпта
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="description"
+                                   name="description"
+                                   value="{{ system_prompt.description if system_prompt else '' }}"
+                                   placeholder="Краткое описание того, что делает этот промпт">
+                            <div class="form-text">Опционально: поясните, для чего используется этот промпт</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="prompt_text" class="form-label">
+                                <i class="bi bi-file-text"></i>
+                                Текст системного промпта <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control font-monospace"
+                                      id="prompt_text"
+                                      name="prompt_text"
+                                      rows="15"
+                                      required>{{ system_prompt.prompt_text if system_prompt else '' }}</textarea>
+                            <div class="form-text">
+                                Этот промпт будет использоваться как системная инструкция для AI модели на данном этапе.
+                                Он автоматически копируется всем новым пользователям.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Внимание:</strong> Изменение системного промпта НЕ повлияет на уже существующие
+                            пользовательские промпты. Новые пользователи получат обновлённую версию.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i>
+                                Сохранить
+                            </button>
+                            <a href="{{ url_for('settings.prompts') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i>
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if system_prompt %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i>
+                    История изменений
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Создан:</strong> {{ system_prompt.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                    <p class="mb-0"><strong>Обновлён:</strong> {{ system_prompt.updated_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

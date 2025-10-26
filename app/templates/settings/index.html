@@ -4,16 +4,27 @@
 
 <div class="card">
   <h2 class="card__title">Личные настройки</h2>
-  <p class="card__sub">Здесь будут ваши персональные настройки.</p>
+  <p class="card__sub">Настройка системных промптов для обработки новостей</p>
+  <a href="{{ url_for('settings.my_prompts') }}" class="btn btn--primary">
+    <i class="bi bi-chat-square-text"></i>
+    Мои промпты
+  </a>
 </div>
 
 {% if current_user.is_admin %}
 <div class="card" style="border-color: var(--warn);">
   <h2 class="card__title">⚙️ Администрирование</h2>
   <p class="card__sub">Управление системой и пользователями</p>
-  <a href="{{ url_for('settings.users') }}" class="btn btn--admin">
-    Управление пользователями
-  </a>
+  <div class="d-flex flex-column gap-2">
+    <a href="{{ url_for('settings.users') }}" class="btn btn--admin">
+      <i class="bi bi-people"></i>
+      Управление пользователями
+    </a>
+    <a href="{{ url_for('settings.prompts') }}" class="btn btn--admin">
+      <i class="bi bi-chat-square-dots"></i>
+      Системные промпты
+    </a>
+  </div>
 </div>
 {% endif %}
 
