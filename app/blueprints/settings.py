@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.auth.decorators import admin_required
 from app.extensions import db
@@ -191,3 +191,78 @@ def reset_my_prompt(stage_id):
         flash(str(e), "error")
 
     return redirect(url_for('settings.my_prompts'))
+
+
+# ============================================================================
+# Управление настройками поиска (Brave Search API)
+# ============================================================================
+
+@settings_bp.route('/search')
+@login_required
+@admin_required
+def search_settings():
+    """Настройки поисковой системы"""
+    from flask import current_app
+
+    # Получаем текущие настройки
+    api_key = current_app.config.get('BRAVE_SEARCH_API_KEY', '')
+    is_enabled = current_app.config.get('BRAVE_SEARCH_ENABLED', False)
+
+    return render_template('settings/search.html',
+                           title='Настройки поиска',
+                           api_key=api_key,
+                           is_enabled=is_enabled)
+
+
+@settings_bp.route('/search/update', methods=['POST'])
+@login_required
+@admin_required
+def update_search_settings():
+    """Обновить настройки Brave Search API"""
+    from flask import current_app
+    import os
+
+    api_key = request.form.get('api_key', '').strip()
+    is_enabled = request.form.get('is_enabled') == 'on'
+
+    # Обновляем в текущем конфиге
+    current_app.config['BRAVE_SEARCH_API_KEY'] = api_key
+    current_app.config['BRAVE_SEARCH_ENABLED'] = is_enabled
+
+    # TODO: В будущем сохранять в БД или .env файл
+    # Пока просто обновляем в памяти приложения
+
+    if api_key:
+        flash("Настройки Brave Search обновлены. Для постоянного сохранения добавьте в .env файл", "success")
+    else:
+        flash("API ключ удалён из конфигурации", "warning")
+
+    return redirect(url_for('settings.search_settings'))
+
+
+@settings_bp.route('/search/test', methods=['POST'])
+@login_required
+@admin_required
+def test_search():
+    """Тестирование подключения к Brave Search API"""
+    from flask import current_app
+    from app.services.search_providers import test_brave_connection
+
+    api_key = request.form.get('api_key', '').strip()
+
+    if not api_key:
+        api_key = current_app.config.get('BRAVE_SEARCH_API_KEY')
+
+    if not api_key:
+        return jsonify({
+            'success': False,
+            'message': '❌ API ключ не указан'
+        })
+
+    # Тестируем подключение
+    success, message = test_brave_connection(api_key)
+
+    return jsonify({
+        'success': success,
+        'message': message
+    })

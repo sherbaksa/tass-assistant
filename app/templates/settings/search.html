@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p class="page__intro">
+  Настройка поисковой системы для проверки свежести новостей.
+  В данный момент поддерживается <strong>Brave Search API</strong>.
+</p>
+
+<div class="card">
+  <h2 class="card__title">🔍 Brave Search API</h2>
+  
+  <form method="post" action="{{ url_for('settings.update_search_settings') }}" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div>
+      <label class="label" for="api_key">API ключ</label>
+      <input type="text"
+             id="api_key"
+             name="api_key"
+             class="input"
+             value="{{ api_key or '' }}"
+             placeholder="BSAxxxxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="help">
+        Получите API ключ на <a href="https://brave.com/search/api/" target="_blank">brave.com/search/api</a>
+        <br>
+        <strong>Free tier:</strong> 2,000 запросов/месяц бесплатно
+      </div>
+    </div>
+
+    <div>
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox"
+               name="is_enabled"
+               {% if is_enabled %}checked{% endif %}>
+        <span>Поиск включён</span>
+      </label>
+      <div class="help">
+        Если выключено, этап "Анализ результатов поиска" будет пропускаться
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <button type="submit" class="btn btn--primary">💾 Сохранить</button>
+      <button type="button" class="btn btn--muted" id="testSearchBtn">🔌 Проверить подключение</button>
+      <a href="{{ url_for('settings.index') }}" class="btn btn--muted">Назад</a>
+    </div>
+  </form>
+
+  <!-- Результат теста подключения -->
+  <div id="testResult" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: var(--radius-sm);"></div>
+</div>
+
+<div class="card" style="margin-top: 1rem;">
+  <h3>💡 Информация о Brave Search API</h3>
+  
+  <div style="margin-top: 1rem;">
+    <h4>Тарифы:</h4>
+    <ul>
+      <li><strong>Free:</strong> 2,000 запросов/месяц - бесплатно</li>
+      <li><strong>Pro:</strong> 20,000 запросов/месяц - $5/месяц</li>
+      <li><strong>Pro AI:</strong> 100,000 запросов/месяц - $25/месяц</li>
+    </ul>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <h4>Особенности:</h4>
+    <ul>
+      <li>✅ Независимый индекс (не использует Google/Bing)</li>
+      <li>✅ Хорошая поддержка новостного контента</li>
+      <li>✅ Фильтры по свежести (день/неделя/месяц/год)</li>
+      <li>✅ Поддержка различных языков и стран</li>
+      <li>✅ Быстрый и стабильный API</li>
+    </ul>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <h4>Документация:</h4>
+    <ul>
+      <li><a href="https://api.search.brave.com/app/documentation/web-search/get-started" target="_blank">Getting Started</a></li>
+      <li><a href="https://api.search.brave.com/app/documentation/web-search/codes" target="_blank">API Reference</a></li>
+    </ul>
+  </div>
+
+  <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,193,7,.1); border: 1px solid rgba(255,193,7,.3); border-radius: var(--radius-sm);">
+    <strong>⚠️ Важно:</strong> После сохранения API ключа рекомендуется добавить его в файл <code>.env</code> для постоянного хранения:
+    <pre style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,0,0,.3); border-radius: 4px;">BRAVE_SEARCH_API_KEY=ваш_ключ_здесь
+BRAVE_SEARCH_ENABLED=1</pre>
+  </div>
+</div>
+
+<script>
+document.getElementById('testSearchBtn').addEventListener('click', async function() {
+  const btn = this;
+  const resultDiv = document.getElementById('testResult');
+  const apiKeyInput = document.getElementById('api_key');
+  const apiKey = apiKeyInput.value.trim();
+
+  if (!apiKey) {
+    resultDiv.style.display = 'block';
+    resultDiv.style.background = 'rgba(255,193,7,.15)';
+    resultDiv.style.border = '1px solid rgba(255,193,7,.3)';
+    resultDiv.style.color = 'var(--warn)';
+    resultDiv.textContent = '⚠️ Введите API ключ для тестирования';
+    return;
+  }
+
+  // Блокируем кнопку
+  btn.disabled = true;
+  btn.textContent = '⏳ Проверка...';
+
+  // Показываем индикатор загрузки
+  resultDiv.style.display = 'block';
+  resultDiv.style.background = 'rgba(255,255,255,.02)';
+  resultDiv.style.border = '1px solid var(--tass-border)';
+  resultDiv.textContent = '⏳ Тестирование подключения к Brave Search API...';
+
+  try {
+    const formData = new FormData();
+    formData.append('api_key', apiKey);
+
+    const response = await fetch('{{ url_for("settings.test_search") }}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token() }}'
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    // Показываем результат
+    if (data.success) {
+      resultDiv.style.background = 'rgba(38,208,124,.15)';
+      resultDiv.style.border = '1px solid rgba(38,208,124,.3)';
+      resultDiv.style.color = 'var(--ok)';
+    } else {
+      resultDiv.style.background = 'rgba(255,82,82,.15)';
+      resultDiv.style.border = '1px solid rgba(255,82,82,.3)';
+      resultDiv.style.color = 'var(--err)';
+    }
+
+    resultDiv.textContent = data.message;
+
+  } catch (error) {
+    resultDiv.style.background = 'rgba(255,82,82,.15)';
+    resultDiv.style.border = '1px solid rgba(255,82,82,.3)';
+    resultDiv.style.color = 'var(--err)';
+    resultDiv.textContent = '❌ Ошибка выполнения запроса: ' + error.message;
+  } finally {
+    // Разблокируем кнопку
+    btn.disabled = false;
+    btn.textContent = '🔌 Проверить подключение';
+  }
+});
+</script>
+
+{% endblock %}

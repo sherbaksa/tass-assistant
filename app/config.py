@@ -4,6 +4,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent  # .../tass-assistant
 DEFAULT_SQLITE = PROJECT_ROOT / "app.db"
 
+
 class Config:
     # базовое
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
@@ -24,6 +25,7 @@ class Config:
 
     MAIL_BACKEND = os.getenv("MAIL_BACKEND", "smtp")
     SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+
     # токены
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", "dev-salt")
 
@@ -35,13 +37,20 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "1") == "1"
 
+    # Brave Search API
+    BRAVE_SEARCH_API_KEY = os.getenv("BRAVE_SEARCH_API_KEY")
+    BRAVE_SEARCH_ENABLED = os.getenv("BRAVE_SEARCH_ENABLED", "0") == "1"
+
+
 class DevConfig(Config):
     ENV = "development"
     SESSION_COOKIE_SECURE = False
 
+
 class ProdConfig(Config):
     DEBUG = False
     ENV = "production"
+
 
 def get_config():
     env = os.getenv("FLASK_ENV", "development").lower()
