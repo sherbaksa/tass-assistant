@@ -21,6 +21,8 @@
       <p class="card__sub">Вставьте текст новости и выберите этапы обработки</p>
 
       <form id="newsProcessingForm" class="form" data-action-url="{{ url_for('main.process_news') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <div>
           <label class="label" for="newsText">Текст новости</label>
           <div

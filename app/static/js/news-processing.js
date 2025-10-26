@@ -85,11 +85,15 @@ document.addEventListener('DOMContentLoaded', function() {
     resultsContainer.style.display = 'none';
 
     try {
+      // Получаем CSRF токен
+      const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+
       // Отправляем запрос
       const response = await fetch(form.dataset.actionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
           news_text: newsText,
