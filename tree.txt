@@ -48,8 +48,10 @@
 │   │   ├── __pycache__
 │   │   │   ├── __init__.cpython-313.pyc
 │   │   │   ├── ai_providers.cpython-313.pyc
+│   │   │   ├── pipeline_processor.cpython-313.pyc
 │   │   │   └── prompt_manager.cpython-313.pyc
 │   │   ├── ai_providers.py
+│   │   ├── pipeline_processor.py
 │   │   ├── prompt_manager.py
 │   │   ├── search_providers.py
 │   │   └── test
@@ -57,7 +59,8 @@
 │   │   ├── css
 │   │   │   └── tass.css
 │   │   └── js
-│   │       └── app.js
+│   │       ├── app.js
+│   │       └── news-processing.js
 │   └── templates
 │       ├── assistants
 │       │   ├── edit_model.html
@@ -122,4 +125,4 @@
 ├── tree.txt
 └── wsgi.py
 
-25 directories, 97 files
+25 directories, 100 files
