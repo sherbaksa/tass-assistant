@@ -682,3 +682,252 @@ textarea.form-control {
   font-size: 13px;
   color: var(--tass-muted);
 }
+/* ============================================================================
+   Formatted Results Display - читаемый вывод результатов анализа
+   ============================================================================ */
+
+/* Общий контейнер форматированного результата */
+.formatted-result {
+  color: var(--tass-text);
+  line-height: 1.6;
+}
+
+/* Заголовки разделов */
+.formatted-result h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tass-primary-weak);
+  margin: 16px 0 8px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--tass-border);
+}
+
+.formatted-result h3:first-child {
+  margin-top: 0;
+}
+
+/* Категории/коды классификации */
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.category-item {
+  padding: 12px;
+  background: rgba(31, 74, 255, 0.08);
+  border: 1px solid rgba(31, 74, 255, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.category-code {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--tass-primary-weak);
+}
+
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(38, 208, 124, 0.15);
+  color: var(--ok);
+  border: 1px solid rgba(38, 208, 124, 0.3);
+}
+
+.category-reasoning {
+  font-size: 14px;
+  color: var(--tass-muted);
+  line-height: 1.5;
+}
+
+/* Список проблем (ошибки, стилистика и т.д.) */
+.issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.issue-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+}
+
+.issue-item--high {
+  border-left-color: var(--err);
+  background: rgba(255, 82, 82, 0.05);
+}
+
+.issue-item--medium {
+  border-left-color: var(--warn);
+  background: rgba(255, 176, 32, 0.05);
+}
+
+.issue-item--low {
+  border-left-color: var(--tass-muted);
+}
+
+.issue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.issue-type {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--tass-text);
+}
+
+.severity-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.severity-badge--high {
+  background: rgba(255, 82, 82, 0.2);
+  color: var(--err);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+.severity-badge--medium {
+  background: rgba(255, 176, 32, 0.2);
+  color: var(--warn);
+  border: 1px solid rgba(255, 176, 32, 0.3);
+}
+
+.severity-badge--low {
+  background: rgba(157, 176, 225, 0.15);
+  color: var(--tass-muted);
+  border: 1px solid var(--tass-border);
+}
+
+.issue-description {
+  font-size: 14px;
+  color: var(--tass-text);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.issue-excerpt {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--tass-muted);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Общая оценка */
+.overall-verdict {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(31, 74, 255, 0.08);
+  border: 1px solid rgba(31, 74, 255, 0.2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.verdict-label {
+  font-size: 14px;
+  color: var(--tass-muted);
+  font-weight: 600;
+}
+
+.verdict-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tass-primary-weak);
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  background: rgba(38, 208, 124, 0.15);
+  color: var(--ok);
+  border: 2px solid rgba(38, 208, 124, 0.3);
+}
+
+/* Тональность */
+.tonality-assessment {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--tass-border);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+}
+
+.tonality-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tonality-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--tass-text);
+}
+
+.tonality-value {
+  font-weight: 700;
+  color: var(--tass-primary-weak);
+}
+
+.objectivity-score {
+  font-size: 13px;
+  color: var(--tass-muted);
+  margin-top: 4px;
+}
+
+/* Общие комментарии */
+.general-comments {
+  padding: 12px;
+  background: rgba(255, 176, 32, 0.08);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius-sm);
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--tass-text);
+}
+
+/* Пустое состояние для секций без данных */
+.empty-section {
+  padding: 12px;
+  text-align: center;
+  color: var(--tass-muted);
+  font-size: 13px;
+  font-style: italic;
+}

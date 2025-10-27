@@ -160,8 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
 
       if (isSuccess) {
+        // Пытаемся распарсить JSON и отформатировать
+        const formattedContent = formatStageContent(result.stage_name, result.content);
+
         html += `
-          <div class="result-content">${escapeHtml(result.content)}</div>
+          <div class="result-content">${formattedContent}</div>
           <div class="result-meta">
             Модель: ${escapeHtml(result.model_used || 'Неизвестно')}
             ${result.fallback_used ? ' <span style="color: var(--warn);">(использован резервный вариант)</span>' : ''}
@@ -184,9 +187,288 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
+   * Форматирование контента в зависимости от типа этапа
+   */
+  function formatStageContent(stageName, content) {
+    // Убираем markdown блоки кода если есть
+    content = content.trim();
+    if (content.startsWith('```json') || content.startsWith('```')) {
+      content = content.replace(/^```json?\s*/i, '').replace(/```\s*$/, '').trim();
+    }
+
+    // Пытаемся распарсить JSON
+    let jsonData;
+    try {
+      jsonData = JSON.parse(content);
+    } catch (e) {
+      // Если не JSON, возвращаем как есть
+      return `<div class="formatted-result">${escapeHtml(content)}</div>`;
+    }
+
+    // Форматируем в зависимости от этапа
+    switch (stageName) {
+      case 'classification':
+        return formatClassification(jsonData);
+      case 'freshness_check':
+        return formatFreshnessCheck(jsonData);
+      case 'freshness_analysis':
+        return formatFreshnessAnalysis(jsonData);
+      case 'analysis':
+        return formatAnalysis(jsonData);
+      case 'recommendations':
+        return formatRecommendations(jsonData);
+      default:
+        // Красивый JSON fallback
+        return `<div class="formatted-result"><pre>${escapeHtml(JSON.stringify(jsonData, null, 2))}</pre></div>`;
+    }
+  }
+
+  /**
+   * Форматирование результатов классификации
+   */
+  function formatClassification(data) {
+    if (!data.codes || !Array.isArray(data.codes)) {
+      return '<div class="empty-section">Нет данных о классификации</div>';
+    }
+
+    let html = '<div class="formatted-result">';
+    html += '<div class="category-list">';
+
+    data.codes.forEach(item => {
+      html += `
+        <div class="category-item">
+          <div class="category-header">
+            <span class="category-code">${escapeHtml(item.code)}</span>
+            <span class="confidence-badge">
+              📊 ${item.confidence}%
+            </span>
+          </div>
+          <div class="category-reasoning">${escapeHtml(item.reasoning)}</div>
+        </div>
+      `;
+    });
+
+    html += '</div></div>';
+    return html;
+  }
+
+  /**
+   * Форматирование проверки на свежесть
+   */
+  function formatFreshnessCheck(data) {
+    let html = '<div class="formatted-result">';
+
+    if (data.search_query) {
+      html += `<p><strong>Поисковый запрос:</strong> ${escapeHtml(data.search_query)}</p>`;
+    }
+
+    if (data.results && Array.isArray(data.results)) {
+      html += `<h3>Найдено публикаций: ${data.results.length}</h3>`;
+      // Можно добавить список результатов поиска если нужно
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Форматирование анализа свежести
+   */
+  function formatFreshnessAnalysis(data) {
+    let html = '<div class="formatted-result">';
+
+    if (data.verdict) {
+      html += `
+        <div class="overall-verdict">
+          <span class="verdict-label">Вердикт:</span>
+          <span class="verdict-value">${escapeHtml(data.verdict)}</span>
+        </div>
+      `;
+    }
+
+    if (data.reasoning) {
+      html += `<p>${escapeHtml(data.reasoning)}</p>`;
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Форматирование анализа новости
+   */
+  function formatAnalysis(data) {
+    if (!data.news_analysis) {
+      return '<div class="empty-section">Нет данных анализа</div>';
+    }
+
+    const analysis = data.news_analysis;
+    let html = '<div class="formatted-result">';
+
+    // Общий вердикт и оценка
+    if (analysis.overall_verdict || analysis.summary_score) {
+      html += '<div class="overall-verdict">';
+      if (analysis.overall_verdict) {
+        html += `<span class="verdict-label">Вердикт:</span>`;
+        html += `<span class="verdict-value">${escapeHtml(analysis.overall_verdict)}</span>`;
+      }
+      if (analysis.summary_score) {
+        html += `<span class="score-badge">${escapeHtml(analysis.summary_score)}</span>`;
+      }
+      html += '</div>';
+    }
+
+    const details = analysis.detailed_analysis;
+    if (details) {
+      // Фактические ошибки
+      if (details.factual_errors && details.factual_errors.length > 0) {
+        html += '<h3>⚠️ Фактические ошибки</h3>';
+        html += '<div class="issue-list">';
+        details.factual_errors.forEach(issue => {
+          html += formatIssue(issue);
+        });
+        html += '</div>';
+      } else {
+        html += '<h3>✅ Фактические ошибки</h3>';
+        html += '<div class="empty-section">Не обнаружено</div>';
+      }
+
+      // Стилистические замечания
+      if (details.stylistic_issues && details.stylistic_issues.length > 0) {
+        html += '<h3>📝 Стилистические замечания</h3>';
+        html += '<div class="issue-list">';
+        details.stylistic_issues.forEach(issue => {
+          html += formatIssue(issue);
+        });
+        html += '</div>';
+      } else {
+        html += '<h3>✅ Стилистические замечания</h3>';
+        html += '<div class="empty-section">Не обнаружено</div>';
+      }
+
+      // Лингвистические ошибки
+      if (details.linguistic_errors && details.linguistic_errors.length > 0) {
+        html += '<h3>✏️ Лингвистические ошибки</h3>';
+        html += '<div class="issue-list">';
+        details.linguistic_errors.forEach(issue => {
+          html += formatIssue(issue);
+        });
+        html += '</div>';
+      } else {
+        html += '<h3>✅ Лингвистические ошибки</h3>';
+        html += '<div class="empty-section">Не обнаружено</div>';
+      }
+
+      // Оценка тональности
+      if (details.tonality_assessment) {
+        html += '<h3>🎭 Оценка тональности</h3>';
+        html += formatTonality(details.tonality_assessment);
+      }
+    }
+
+    // Общие комментарии
+    if (analysis.general_comments) {
+      html += '<div class="general-comments">';
+      html += `<strong>💬 Общие комментарии:</strong><br>${escapeHtml(analysis.general_comments)}`;
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Форматирование одной проблемы/ошибки
+   */
+  function formatIssue(issue) {
+    const severity = (issue.severity || '').toLowerCase();
+    const severityClass = severity === 'высокий' || severity === 'high' ? 'high' :
+                         severity === 'средний' || severity === 'medium' ? 'medium' : 'low';
+
+    const severityLabel = severity === 'высокий' || severity === 'high' ? 'Высокий' :
+                         severity === 'средний' || severity === 'medium' ? 'Средний' : 'Низкий';
+
+    let html = `<div class="issue-item issue-item--${severityClass}">`;
+    html += '<div class="issue-header">';
+    html += `<span class="issue-type">${escapeHtml(issue.issue_type || 'Замечание')}</span>`;
+    html += `<span class="severity-badge severity-badge--${severityClass}">${severityLabel}</span>`;
+    html += '</div>';
+
+    if (issue.description) {
+      html += `<div class="issue-description">${escapeHtml(issue.description)}</div>`;
+    }
+
+    if (issue.text_excerpt) {
+      html += `<div class="issue-excerpt">"${escapeHtml(issue.text_excerpt)}"</div>`;
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Форматирование оценки тональности
+   */
+  function formatTonality(tonality) {
+    let html = '<div class="tonality-assessment">';
+
+    if (tonality.detected_tonality) {
+      html += '<div class="tonality-header">';
+      html += `<span class="tonality-label">Тональность:</span>`;
+      html += `<span class="tonality-value">${escapeHtml(tonality.detected_tonality)}</span>`;
+      html += '</div>';
+    }
+
+    if (tonality.objectivity_score) {
+      html += `<div class="objectivity-score">Объективность: ${escapeHtml(tonality.objectivity_score)}/5</div>`;
+    }
+
+    if (tonality.issues && tonality.issues.length > 0) {
+      html += '<div class="issue-list" style="margin-top: 12px;">';
+      tonality.issues.forEach(issue => {
+        html += formatIssue(issue);
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Форматирование рекомендаций
+   */
+  function formatRecommendations(data) {
+    let html = '<div class="formatted-result">';
+
+    if (data.recommendations && Array.isArray(data.recommendations)) {
+      html += '<div class="issue-list">';
+      data.recommendations.forEach((rec, idx) => {
+        html += `
+          <div class="issue-item">
+            <div class="issue-header">
+              <span class="issue-type">${idx + 1}. Рекомендация</span>
+            </div>
+            <div class="issue-description">${escapeHtml(rec)}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+    } else if (typeof data === 'string') {
+      html += `<p>${escapeHtml(data)}</p>`;
+    } else {
+      html += '<div class="empty-section">Нет рекомендаций</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  /**
    * Экранирование HTML для безопасного вывода
    */
   function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
     const map = {
       '&': '&amp;',
       '<': '&lt;',
@@ -194,6 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
       '"': '&quot;',
       "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(text).replace(/[&<>"']/g, m => map[m]);
   }
 });
